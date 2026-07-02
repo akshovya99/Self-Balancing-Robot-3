@@ -1,4 +1,4 @@
-# ⚖️ Autonomous Self-Balancing Robot
+# Autonomous Self-Balancing Robot
 
 > A two-wheeled inverted-pendulum robot that evolved across three hardware generations — from a jumper-wired proof-of-concept to a precision, encoder-driven production build running a deterministic 5 ms triple-loop PID controller with Kalman-filtered sensor fusion.
 
@@ -6,7 +6,7 @@ The robot continuously estimates its tilt angle from a 6-axis IMU, fuses it with
 
 ---
 
-## 🧠 System Architecture Summary
+## System Architecture Summary
 
 | Layer | Role |
 |---|---|
@@ -20,7 +20,7 @@ The robot continuously estimates its tilt angle from a 6-axis IMU, fuses it with
 
 ---
 
-## 🏗️ Hardware Evolution: Three Generations
+## Hardware Evolution: Three Generations
 
 The project was iterated through three distinct hardware revisions, each targeting a specific engineering milestone — from raw signal validation to a rigid, encoder-precise final build.
 
@@ -36,34 +36,34 @@ The project was iterated through three distinct hardware revisions, each targeti
 
 ### Generation-by-Generation Notes
 
-**🟢 Generation 1 — Proof-of-Concept Breadboard Prototype**
+**Generation 1 — Proof-of-Concept Breadboard Prototype**
 **Hardware Setup:** Circular multi-tiered acrylic chassis, standard yellow plastic hobby DC gear motors, jumper-wired MPU6050, and an external power bank acting as a counterweight.
 
 **Engineering Focus:** Initial validation of the I2C communication protocol with the IMU and basic open-loop motor response. This build was primarily used to establish fundamental raw sensor readings and test the physical limits of standard plastic gear motors under rapid directional switching.
 
-**🟡 Generation 2 — Structural & Component Refinement**
+**Generation 2 — Structural & Component Refinement**
 **Hardware Setup:** Elongated rectangular wooden/acrylic custom chassis plate, standalone Arduino Uno, an independent motor driver board, and a top-heavy layout to adjust the center of mass.
 
 **Engineering Focus:** Implementation of the First-Order Complementary Filter (`Yiorderfilter`) and early tuning of the Balance PD loop. The design transitioned to a longer wheelbase to lower the angular acceleration, providing a wider physical window for the control loops to correct tilting errors.
 
-**🔵 Generation 3 — Final Production & High-Precision Build**
+**Generation 3 — Final Production & High-Precision Build**
 **Hardware Setup:** Custom clear acrylic sandwich plate chassis, heavy-duty industrial metal gear motors with integrated high-resolution magnetic Hall-effect encoders, rigid brass standoffs, and a highly integrated dual-layer PCB stack (Mainboard + Shield).
 
 **Engineering Focus:** The culmination of the project. Features high-torque actuators to eliminate mechanical backlash, clean wire routing to reduce signal noise, and a deterministic 5 ms hardware timer interrupt system. This build fully integrates the Kalman Filter with the complete nested triple-loop PID control architecture (Balance, Speed, and Steering) to achieve pristine, rock-solid dynamic stability.
 
 ---
 
-## 🎥 Video Demos
+## Video Demos
 
 | Generation 1 | Generation 2 | Generation 3 |
 |---|---|---|
-| [▶ Watch](./videos/version_1_video.mp4) | [▶ Watch](./videos/version_2_video.mp4) | [▶ Watch](./videos/version_3_video.mp4) |
+| [Watch](./videos/version_1_video.mp4) | [Watch](./videos/version_2_video.mp4) | [Watch](./videos/version_3_video.mp4) |
 
 > GitHub renders these as downloadable/playable links when viewing the README on github.com. Click through to view each generation in action.
 
 ---
 
-## 🔁 Software & Control Loop Topology
+## Software & Control Loop Topology
 
 All control logic runs inside a single hardware-timed interrupt (`MsTimer2`, 5 ms period), guaranteeing deterministic loop timing independent of `loop()` jitter.
 
@@ -163,7 +163,7 @@ The three loop outputs are summed and split across left/right motors, clamped to
 
 ---
 
-## 🔌 Hardware & Pin Mapping (Generation 3)
+## Hardware & Pin Mapping (Generation 3)
 
 | Function | Pin |
 |---|---|
@@ -190,7 +190,7 @@ The three loop outputs are summed and split across left/right motors, clamped to
 
 ---
 
-## 📦 Software Dependencies
+## Software Dependencies
 
 Install via the Arduino Library Manager (or place in `~/Documents/Arduino/libraries`):
 
@@ -201,7 +201,7 @@ Install via the Arduino Library Manager (or place in `~/Documents/Arduino/librar
 
 ---
 
-## ⚙️ Setup & Calibration
+## Setup & Calibration
 
 1. **Wire the hardware** according to the [pin mapping](#-hardware--pin-mapping-generation-3) above.
 2. **Install dependencies** listed above via Library Manager.
@@ -210,7 +210,7 @@ Install via the Arduino Library Manager (or place in `~/Documents/Arduino/librar
    - Power on the robot and hold it upright at its true mechanical balance angle.
    - Press and hold the onboard **button** — the robot captures the current tilt angle as `angle0` (its zero reference).
    - Two short **buzzer beeps** confirm calibration is complete.
-   - ⚠️ Calibration only runs once per power cycle — recalibrate after any chassis or weight distribution change.
+   - Calibration only runs once per power cycle — recalibrate after any chassis or weight distribution change.
 5. **Set it down and let go.** The balance loop engages immediately after calibration.
 
 ### Bluetooth Remote Control
@@ -228,7 +228,7 @@ Connect a serial Bluetooth module (e.g. HC-05/HC-06) to the Arduino's UART and s
 
 ---
 
-## 🛠️ Tuning Guide
+## Tuning Guide
 
 If the robot oscillates, drifts, or falls:
 
@@ -242,6 +242,6 @@ Always tune on a soft, open surface, and be ready to catch the robot.
 
 ---
 
-## 📄 License
+## License
 
 MIT — see [LICENSE](LICENSE).
