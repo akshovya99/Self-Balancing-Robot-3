@@ -26,7 +26,6 @@ The project was iterated through three distinct hardware revisions, each targeti
 
 | | **Generation 1**<br>Proof of Concept | **Generation 2**<br>Structural Refinement | **Generation 3**<br>Final Production Build |
 |---|---|---|---|
-| **Image** | ![Generation 1](./images/gen1.jpg) | ![Generation 2](./images/gen2.jpg) | ![Generation 3](./images/gen3.jpg) |
 | **Chassis** | Circular, multi-tiered acrylic platform | Elongated rectangular custom chassis plate | Clear acrylic sandwich-plate chassis with rigid brass standoffs |
 | **Motors** | Standard yellow plastic hobby DC gear motors | Standard DC gear motors, decoupled from control board | Heavy-duty industrial metal gear motors with integrated high-resolution Hall-effect encoders |
 | **Electronics** | Jumper-wired MPU6050, breadboard-style wiring | Standalone Arduino Uno + independent motor driver board | Highly integrated dual-layer PCB stack (custom shield) |
