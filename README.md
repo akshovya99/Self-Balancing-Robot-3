@@ -80,7 +80,7 @@ flowchart TD
 
     KALMAN --> BALANCE["BALANCE LOOP (PD) — every 5ms<br/>PD_pwm = kp·angle + kd·angle_dot"]
     COUNT --> SPEED["SPEED LOOP (PI) — every 40ms (8 ticks)<br/>PI_pwm = ki·pos_err + kp·vel_err"]
-    SPEED --> STEER["STEERING LOOP (PD) — every 20ms (4 ticks)<br/>Turn_pwm = -turnout·kp_turn - Gyro_z·kd_turn"]
+    SPEED --> STEER["STEERING LOOP (PD) — every 25ms (5 ticks)<br/>Turn_pwm = -turnout·kp_turn - Gyro_z·kd_turn"]
 
     BALANCE --> MIX["anglePWM() — motor mixing<br/>pwm1 = -PD -PI -Turn (right)<br/>pwm2 = -PD -PI +Turn (left)<br/>clamp to [-255, 255]<br/>safety cutoff if |angle| > 45°"]
     STEER --> MIX
@@ -104,6 +104,8 @@ The innermost, highest-priority loop. Keeps the robot upright around the calibra
 PD_pwm = kp * (angle + angle0) + kd * angle_speed
 ```
 
+> **Note:** `ki` is declared alongside `kp`/`kd` for this loop but is not referenced in `PD()` — the balance loop is a pure PD controller in the current firmware, not a full PID.
+
 ### 3. Speed Loop (Position/Velocity PI) — 40 ms
 Uses signed, direction-corrected Hall-effect encoder pulses to regulate forward/backward velocity and accumulated position, with anti-windup clamping (`±3550`):
 
@@ -111,7 +113,7 @@ Uses signed, direction-corrected Hall-effect encoder pulses to regulate forward/
 PI_pwm = ki_speed * (setp0 - positions) + kp_speed * (setp0 - speeds_filter)
 ```
 
-### 4. Steering Loop (Yaw PD) — 20 ms
+### 4. Steering Loop (Yaw PD) — 25 ms
 Drives differential wheel speed for turning using gyro Z-axis rate as damping, with a ramped turn-rate output for smooth rotation:
 
 ```
@@ -125,7 +127,7 @@ The three loop outputs are summed and split across left/right motors, clamped to
 
 | Loop | kp | ki | kd |
 |---|---|---|---|
-| Balance (angle) | 15 | 4 | 0.2 |
+| Balance (angle) | 15 | 4 *(unused, see note above)* | 0.2 |
 | Speed | 2.0 | 0.03 | 0 |
 | Steering (turn) | 24 | 0 | 0.08 |
 
