@@ -67,55 +67,23 @@ The project was iterated through three distinct hardware revisions, each targeti
 
 All control logic runs inside a single hardware-timed interrupt (`MsTimer2`, 5 ms period), guaranteeing deterministic loop timing independent of `loop()` jitter.
 
-```
-                         ┌─────────────────────────────┐
-                         │   MsTimer2 ISR — every 5ms   │
-                         └───────────────┬─────────────┘
-                                          │
-                    ┌─────────────────────┼─────────────────────┐
-                    ▼                     ▼                     ▼
-           ┌─────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-           │  Read MPU6050    │  │  Count encoder    │  │   (every tick)   │
-           │  ax, ay, az,     │  │  pulses (Hall     │  │                  │
-           │  gx, gy, gz      │  │  effect ISR)      │  │                  │
-           └────────┬─────────┘  └─────────┬─────────┘  └──────────────────┘
-                    ▼                      ▼
-           ┌─────────────────┐   ┌──────────────────┐
-           │  Kalman Filter   │   │  countpluse()     │
-           │  angle_calculate │   │  direction-signed  │
-           │  → tilt angle    │   │  pulse accumulate  │
-           └────────┬─────────┘   └─────────┬─────────┘
-                    ▼                      │
-        ┌─────────────────────┐            │
-        │  BALANCE LOOP (PD)   │            │
-        │  every 5ms            │           │
-        │  PD_pwm = kp·angle    │           │
-        │        + kd·angle_dot │           │
-        └──────────┬───────────┘            │
-                    │        ┌───────────────┘
-                    │        ▼
-                    │  ┌─────────────────────┐
-                    │  │  SPEED LOOP (PI)      │
-                    │  │  every 40ms (8 ticks) │
-                    │  │  PI_pwm = ki·(pos_err)│
-                    │  │       + kp·(vel_err)  │
-                    │  └──────────┬───────────┘
-                    │             │
-                    │  ┌─────────────────────┐
-                    │  │  STEERING LOOP (PD)   │
-                    │  │  every 20ms (4 ticks) │
-                    │  │  Turn_pwm = -turnout  │
-                    │  │      ·kp_turn         │
-                    │  │      - Gyro_z·kd_turn │
-                    │  └──────────┬───────────┘
-                    ▼             ▼
-           ┌─────────────────────────────────┐
-           │   anglePWM() — motor mixing      │
-           │   pwm1 = -PD -PI -Turn (right)   │
-           │   pwm2 = -PD -PI +Turn (left)    │
-           │   ± clamp to [-255, 255]         │
-           │   safety cutoff if |angle| > 45° │
-           └─────────────────────────────────┘
+```mermaid
+flowchart TD
+    ISR["MsTimer2 ISR — every 5ms"]
+
+    ISR --> READ["Read MPU6050<br/>ax, ay, az, gx, gy, gz"]
+    ISR --> ENC["Count encoder pulses<br/>(Hall-effect ISR)"]
+    ISR --> TICK["(every tick)"]
+
+    READ --> KALMAN["Kalman Filter<br/>angle_calculate<br/>→ tilt angle"]
+    ENC --> COUNT["countpluse()<br/>direction-signed<br/>pulse accumulate"]
+
+    KALMAN --> BALANCE["BALANCE LOOP (PD) — every 5ms<br/>PD_pwm = kp·angle + kd·angle_dot"]
+    COUNT --> SPEED["SPEED LOOP (PI) — every 40ms (8 ticks)<br/>PI_pwm = ki·pos_err + kp·vel_err"]
+    SPEED --> STEER["STEERING LOOP (PD) — every 20ms (4 ticks)<br/>Turn_pwm = -turnout·kp_turn - Gyro_z·kd_turn"]
+
+    BALANCE --> MIX["anglePWM() — motor mixing<br/>pwm1 = -PD -PI -Turn (right)<br/>pwm2 = -PD -PI +Turn (left)<br/>clamp to [-255, 255]<br/>safety cutoff if |angle| > 45°"]
+    STEER --> MIX
 ```
 
 ### 1. Kalman Filter — Angle Estimation
